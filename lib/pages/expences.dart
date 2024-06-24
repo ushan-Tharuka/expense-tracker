@@ -20,7 +20,7 @@ class _ExpencesState extends State<Expences> {
         elevation: 0,
         actions: [
           Container(
-            color: Colors.yellow,
+            color: Colors.blue,
             child: IconButton(
                 onPressed: () {},
                 icon: const Icon(
