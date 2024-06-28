@@ -9,13 +9,13 @@ enum Category { work, food, travel, leasure }
 class ExpenceModel {
   ExpenceModel({
     required this.amount,
-    required this.data,
+    required this.date,
     required this.title,
     required this.category,
   }) : id = uuid;
   final String id;
   final String title;
   final double amount;
-  final DateTime data;
+  final DateTime date;
   final Category category;
 }
