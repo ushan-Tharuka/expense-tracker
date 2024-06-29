@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_advance/models/expence.dart';
+import 'package:flutter_advance/widgets/add_new_expence.dart';
 import 'package:flutter_advance/widgets/expence_list.dart';
 
 class Expences extends StatefulWidget {
@@ -28,6 +29,16 @@ class _ExpencesState extends State<Expences> {
         title: "Bag",
         category: Category.travel),
   ];
+
+  //funtion to open a modal overly
+  void _openAddExpencesOverlay() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return AddNewExpence();
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +53,7 @@ class _ExpencesState extends State<Expences> {
           Container(
             color: Color.fromARGB(255, 0, 123, 60),
             child: IconButton(
-                onPressed: () {},
+                onPressed: _openAddExpencesOverlay,
                 icon: const Icon(
                   Icons.add,
                   color: Colors.black,
