@@ -16,6 +16,29 @@ class _AddNewExpenceState extends State<AddNewExpence> {
 
   Category _selectedCategory = Category.leasure;
 
+  //datepicker variables
+  final DateTime initialDate = DateTime.now();
+  final DateTime firstDate = DateTime(
+      DateTime.now().year - 1, DateTime.now().month, DateTime.now().day);
+  final DateTime lastDate = DateTime(
+      DateTime.now().year + 1, DateTime.now().month, DateTime.now().day);
+  //final date
+  DateTime _selectedDate = DateTime.now();
+
+  //date picker
+  Future<void> _openDataModel() async {
+    try {
+      //show the data model to store user selected
+      final pickedDate = await showDatePicker(
+          context: context, firstDate: firstDate, lastDate: lastDate);
+      setState(() {
+        _selectedDate = pickedDate!;
+      });
+    } catch (err) {
+      print(err.toString());
+    }
+  }
+
   //remove unwant for clean memmory space
   @override
   void dispose() {
@@ -57,10 +80,11 @@ class _AddNewExpenceState extends State<AddNewExpence> {
               //add date picker
               Expanded(
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text("2023/2/2"),
+                    Text(formattedDate.format(_selectedDate)),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: _openDataModel,
                       icon: const Icon(Icons.date_range_outlined),
                     ),
                   ],
@@ -88,25 +112,29 @@ class _AddNewExpenceState extends State<AddNewExpence> {
               ),
               Expanded(
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   //close the model button
                   ElevatedButton(
                     onPressed: () {},
                     style: const ButtonStyle(
-                      backgroundColor: MaterialStatePropertyAll(Colors.redAccent),
+                      backgroundColor:
+                          MaterialStatePropertyAll(Colors.redAccent),
                     ),
                     child: const Text("Close"),
                   ),
-                  SizedBox(width: 8,),
+                  SizedBox(
+                    width: 8,
+                  ),
                   ElevatedButton(
                     onPressed: () {},
                     style: const ButtonStyle(
-                      backgroundColor: MaterialStatePropertyAll(Color.fromARGB(255, 0, 159, 95)),
+                      backgroundColor: MaterialStatePropertyAll(
+                          Color.fromARGB(255, 0, 159, 95)),
                     ),
                     child: const Text("Save"),
                   ),
-      
+
                   //save data and close model button
                 ],
               ))
