@@ -50,9 +50,24 @@ class _ExpencesState extends State<Expences> {
 
   //remove a expence
   void onDeleteExpence(ExpenceModel expence) {
+    ExpenceModel deletingExpence = expence;
+    //get the index of removing expemce
+    final int removingIndex = _expenceList.indexOf(expence);
     setState(() {
       _expenceList.remove(expence);
     });
+    //show snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: const Text("Item Deleted!"),
+          action: SnackBarAction(
+              label: "Undo",
+              onPressed: () {
+                setState(() {
+                  _expenceList.insert(removingIndex, deletingExpence);
+                });
+              })),
+    );
   }
 
   @override
