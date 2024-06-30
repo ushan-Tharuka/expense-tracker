@@ -1,7 +1,10 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_advance/models/expence.dart';
 import 'package:flutter_advance/widgets/add_new_expence.dart';
 import 'package:flutter_advance/widgets/expence_list.dart';
+import 'package:pie_chart/pie_chart.dart';
 
 class Expences extends StatefulWidget {
   const Expences({super.key});
@@ -30,6 +33,21 @@ class _ExpencesState extends State<Expences> {
         category: Category.travel),
   ];
 
+  //pie chart
+  Map<String, double> dataMap = {
+    "Food": 0,
+    "Travel": 0,
+    "Leasure": 0,
+    "Work": 0,
+  };
+  //add new expence
+  void onAddNewExpence(ExpenceModel expence) {
+    setState(() {
+      _expenceList.add(expence);
+      calCategoryValues();
+    });
+  }
+
   //funtion to open a modal overly
   void _openAddExpencesOverlay() {
     showModalBottomSheet(
@@ -41,13 +59,6 @@ class _ExpencesState extends State<Expences> {
         });
   }
 
-  //add new expence
-  void onAddNewExpence(ExpenceModel expence) {
-    setState(() {
-      _expenceList.add(expence);
-    });
-  }
-
   //remove a expence
   void onDeleteExpence(ExpenceModel expence) {
     ExpenceModel deletingExpence = expence;
@@ -55,6 +66,7 @@ class _ExpencesState extends State<Expences> {
     final int removingIndex = _expenceList.indexOf(expence);
     setState(() {
       _expenceList.remove(expence);
+      calCategoryValues();
     });
     //show snackbar
     ScaffoldMessenger.of(context).showSnackBar(
@@ -65,9 +77,59 @@ class _ExpencesState extends State<Expences> {
               onPressed: () {
                 setState(() {
                   _expenceList.insert(removingIndex, deletingExpence);
+                  calCategoryValues();
                 });
               })),
     );
+  }
+
+//Pie chart date
+  double foodVal = 0;
+  double travelVal = 0;
+  double leasureVal = 0;
+  double workVal = 0;
+
+  void calCategoryValues() {
+    double foodValTotal = 0;
+    double travelValTotal = 0;
+    double leasureValTotal = 0;
+    double workValTotal = 0;
+
+    for (final expence in _expenceList) {
+      if (expence.category == Category.food) {
+        foodValTotal += expence.amount;
+      }
+      if (expence.category == Category.travel) {
+        travelValTotal += expence.amount;
+      }
+      if (expence.category == Category.leasure) {
+        leasureValTotal += expence.amount;
+      }
+      if (expence.category == Category.work) {
+        workValTotal += expence.amount;
+      }
+    }
+
+    setState(() {
+      foodVal = foodValTotal;
+      travelVal = travelValTotal;
+      leasureVal = leasureValTotal;
+      workVal = workValTotal;
+    });
+
+    //update the detaMap
+    dataMap = {
+      "Food": foodVal,
+      "Travel": travelVal,
+      "Leasure": leasureVal,
+      "Work": workVal,
+    };
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    calCategoryValues();
   }
 
   @override
@@ -94,6 +156,19 @@ class _ExpencesState extends State<Expences> {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: PieChart(
+              dataMap: dataMap,
+              animationDuration: Duration(milliseconds: 800),
+              // chartLegendSpacing: 20,
+              chartRadius: MediaQuery.of(context).size.width / 2.2,
+              initialAngleInDegree: 0,
+              chartType: ChartType.ring,
+              ringStrokeWidth: 32,
+              centerText: "Expences",
+            ),
+          ),
           ExpenceList(
             expenceList: _expenceList,
             onDeleteExpence: onDeleteExpence,
