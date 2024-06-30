@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_advance/models/expence.dart';
 
 class AddNewExpence extends StatefulWidget {
-  const AddNewExpence({super.key});
+  final void Function(ExpenceModel expence) onAddExpence;
+  const AddNewExpence({super.key, required this.onAddExpence});
 
   @override
   State<AddNewExpence> createState() => _AddNewExpenceState();
@@ -36,6 +37,41 @@ class _AddNewExpenceState extends State<AddNewExpence> {
       });
     } catch (err) {
       print(err.toString());
+    }
+  }
+
+  //Handle form submit
+  void _handleFormSubmit() {
+    //form validation
+    //convert amount to double
+    final userAmount = double.parse(_amountController.text.trim());
+    if (_titleController.text.trim().isEmpty || userAmount <= 0) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text("Enter Valid Data"),
+              content: const Text("Please enter valid Title and Amount"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Close"),
+                )
+              ],
+            );
+          });
+    } else {
+      //create new expence
+      ExpenceModel newExpence = ExpenceModel(
+          amount: userAmount,
+          date: _selectedDate,
+          title: _titleController.text.trim(),
+          category: _selectedCategory);
+      //Save the date
+      widget.onAddExpence(newExpence);
+      Navigator.pop(context);
     }
   }
 
@@ -116,7 +152,9 @@ class _AddNewExpenceState extends State<AddNewExpence> {
                 children: [
                   //close the model button
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                     style: const ButtonStyle(
                       backgroundColor:
                           MaterialStatePropertyAll(Colors.redAccent),
@@ -127,7 +165,7 @@ class _AddNewExpenceState extends State<AddNewExpence> {
                     width: 8,
                   ),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: _handleFormSubmit,
                     style: const ButtonStyle(
                       backgroundColor: MaterialStatePropertyAll(
                           Color.fromARGB(255, 0, 159, 95)),

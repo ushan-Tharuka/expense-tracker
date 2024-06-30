@@ -35,8 +35,17 @@ class _ExpencesState extends State<Expences> {
     showModalBottomSheet(
         context: context,
         builder: (context) {
-          return AddNewExpence();
+          return AddNewExpence(
+            onAddExpence: onAddNewExpence,
+          );
         });
+  }
+
+  //add new expence
+  void onAddNewExpence(ExpenceModel expence) {
+    setState(() {
+      _expenceList.add(expence);
+    });
   }
 
   @override
