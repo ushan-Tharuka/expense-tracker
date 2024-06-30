@@ -48,6 +48,13 @@ class _ExpencesState extends State<Expences> {
     });
   }
 
+  //remove a expence
+  void onDeleteExpence(ExpenceModel expence) {
+    setState(() {
+      _expenceList.remove(expence);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,7 +79,10 @@ class _ExpencesState extends State<Expences> {
       ),
       body: Column(
         children: [
-          ExpenceList(expenceList: _expenceList),
+          ExpenceList(
+            expenceList: _expenceList,
+            onDeleteExpence: onDeleteExpence,
+          ),
         ],
       ),
     );
