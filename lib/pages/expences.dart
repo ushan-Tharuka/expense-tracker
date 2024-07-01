@@ -2,8 +2,10 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_advance/models/expence.dart';
+import 'package:flutter_advance/server/database.dart';
 import 'package:flutter_advance/widgets/add_new_expence.dart';
 import 'package:flutter_advance/widgets/expence_list.dart';
+import 'package:hive/hive.dart';
 import 'package:pie_chart/pie_chart.dart';
 
 class Expences extends StatefulWidget {
@@ -14,24 +16,27 @@ class Expences extends StatefulWidget {
 }
 
 class _ExpencesState extends State<Expences> {
+  final _myBox = Hive.box("expenceDatabase");
+  Database db = Database();
+
   //expenceList
-  final List<ExpenceModel> _expenceList = [
-    ExpenceModel(
-        amount: 10.5,
-        date: DateTime.now(),
-        title: "Cricket",
-        category: Category.leasure),
-    ExpenceModel(
-        amount: 10.9,
-        date: DateTime.now(),
-        title: "Rice",
-        category: Category.food),
-    ExpenceModel(
-        amount: 20,
-        date: DateTime.now(),
-        title: "Bag",
-        category: Category.travel),
-  ];
+  // final List<ExpenceModel> _expenceList = [
+  //   ExpenceModel(
+  //       amount: 10.5,
+  //       date: DateTime.now(),
+  //       title: "Cricket",
+  //       category: Category.leasure),
+  //   ExpenceModel(
+  //       amount: 10.9,
+  //       date: DateTime.now(),
+  //       title: "Rice",
+  //       category: Category.food),
+  //   ExpenceModel(
+  //       amount: 20,
+  //       date: DateTime.now(),
+  //       title: "Bag",
+  //       category: Category.travel),
+  // ];
 
   //pie chart
   Map<String, double> dataMap = {
@@ -43,9 +48,10 @@ class _ExpencesState extends State<Expences> {
   //add new expence
   void onAddNewExpence(ExpenceModel expence) {
     setState(() {
-      _expenceList.add(expence);
+      db.expenceList.add(expence);
       calCategoryValues();
     });
+    db.updateData();
   }
 
   //funtion to open a modal overly
@@ -63,9 +69,10 @@ class _ExpencesState extends State<Expences> {
   void onDeleteExpence(ExpenceModel expence) {
     ExpenceModel deletingExpence = expence;
     //get the index of removing expemce
-    final int removingIndex = _expenceList.indexOf(expence);
+    final int removingIndex = db.expenceList.indexOf(expence);
     setState(() {
-      _expenceList.remove(expence);
+      db.expenceList.remove(expence);
+      db.updateData();
       calCategoryValues();
     });
     //show snackbar
@@ -76,7 +83,8 @@ class _ExpencesState extends State<Expences> {
               label: "Undo",
               onPressed: () {
                 setState(() {
-                  _expenceList.insert(removingIndex, deletingExpence);
+                  db.expenceList.insert(removingIndex, deletingExpence);
+                  db.updateData();
                   calCategoryValues();
                 });
               })),
@@ -95,7 +103,7 @@ class _ExpencesState extends State<Expences> {
     double leasureValTotal = 0;
     double workValTotal = 0;
 
-    for (final expence in _expenceList) {
+    for (final expence in db.expenceList) {
       if (expence.category == Category.food) {
         foodValTotal += expence.amount;
       }
@@ -129,7 +137,14 @@ class _ExpencesState extends State<Expences> {
   @override
   void initState() {
     super.initState();
-    calCategoryValues();
+    //if this is the first time create the inial date
+    if (_myBox.get("EXP_DATA") == null) {
+      db.createInitialDatabase();
+      calCategoryValues();
+    } else {
+      db.loadData();
+      calCategoryValues();
+    }
   }
 
   @override
@@ -144,7 +159,7 @@ class _ExpencesState extends State<Expences> {
         elevation: 0,
         actions: [
           Container(
-            color: Color.fromARGB(255, 0, 123, 60),
+            color: const Color.fromARGB(255, 0, 123, 60),
             child: IconButton(
                 onPressed: _openAddExpencesOverlay,
                 icon: const Icon(
@@ -165,12 +180,12 @@ class _ExpencesState extends State<Expences> {
               chartRadius: MediaQuery.of(context).size.width / 2.2,
               initialAngleInDegree: 0,
               chartType: ChartType.ring,
-              ringStrokeWidth: 32,
+              ringStrokeWidth: 25,
               centerText: "Expences",
             ),
           ),
           ExpenceList(
-            expenceList: _expenceList,
+            expenceList: db.expenceList,
             onDeleteExpence: onDeleteExpence,
           ),
         ],

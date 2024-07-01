@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
+import 'package:hive/hive.dart';
+part 'expence.g.dart';
 
 //create a unique id usign uuid
 final uuid = const Uuid().v4();
@@ -18,6 +20,7 @@ final CategoryIcons = {
   Category.work: Icons.work,
 };
 
+@HiveType(typeId: 1)
 class ExpenceModel {
   ExpenceModel({
     required this.amount,
@@ -25,10 +28,16 @@ class ExpenceModel {
     required this.title,
     required this.category,
   }) : id = uuid;
+
+  @HiveField(0)
   final String id;
+  @HiveField(1)
   final String title;
+  @HiveField(2)
   final double amount;
+  @HiveField(3)
   final DateTime date;
+  @HiveField(4)
   final Category category;
 
   //getter > formated date
